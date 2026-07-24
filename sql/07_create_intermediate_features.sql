@@ -1,7 +1,6 @@
 USE WAREHOUSE cafe_wh;
 USE DATABASE cafe_location_intelligence;
 
-CREATE OR REPLACE SCHEMA intermediate;
 USE SCHEMA intermediate;
 
 CREATE OR REPLACE VIEW int_cafe_nearby_features AS
