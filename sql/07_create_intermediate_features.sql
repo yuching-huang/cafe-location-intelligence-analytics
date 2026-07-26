@@ -11,8 +11,16 @@ SELECT
     COUNT_IF(amenity_type = 'parking') AS parking_count_300m,
     COUNT_IF(amenity_type = 'competing_cafe') AS competing_cafe_count_500m,
 
-    AVG(CASE WHEN amenity_type = 'competing_cafe' THEN nearby_rating END) AS avg_competitor_rating_500m,
-    SUM(CASE WHEN amenity_type = 'competing_cafe' THEN COALESCE(nearby_review_count, 0) ELSE 0 END) AS competitor_review_count_500m
+    AVG(
+        CASE WHEN amenity_type = 'competing_cafe' THEN nearby_rating 
+        END
+    ) AS avg_competitor_rating_500m,
 
-FROM cafe_location_intelligence.staging.stg_google_nearby_places
+    SUM(
+        CASE WHEN amenity_type = 'competing_cafe' THEN COALESCE(nearby_review_count, 0)
+        ELSE 0
+        END
+    ) AS competitor_review_count_500m\
+
+FROM {{ ref('stg_google_nearby_cafes') }}
 GROUP BY cafe_place_id;
