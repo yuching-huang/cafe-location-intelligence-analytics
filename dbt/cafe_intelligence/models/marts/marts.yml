@@ -1,0 +1,186 @@
+version: 2
+
+models:
+  - name: mart_cafe_location
+    description: >
+      Final analytics mart containing café characteristics, surrounding
+      amenities, proximity features, and composite scores for accessibility,
+      food diversity, competition, demand, and overall location opportunity.
+
+    columns:
+      - name: cafe_id
+        description: Unique Google Places identifier for the café.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_unique_cafes')
+                field: cafe_id
+
+      - name: cafe_name
+        description: Name of the café.
+        data_tests:
+          - not_null
+
+      - name: found_in_neighborhoods
+        description: Neighborhood searches in which the café appeared.
+
+      - name: rating
+        description: Average Google rating for the café.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 5
+
+      - name: review_count
+        description: Number of Google reviews for the café.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: price_level
+        description: Google Places price-level classification.
+
+      - name: primary_type
+        description: Primary Google Places category assigned to the café.
+
+      - name: formatted_address
+        description: Full formatted address of the café.
+
+      - name: latitude
+        description: Latitude coordinate of the café.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -90
+                max_value: 90
+
+      - name: longitude
+        description: Longitude coordinate of the café.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -180
+                max_value: 180
+
+      - name: transit_stop_count_500m
+        description: Number of nearby transit stations.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: parking_count_300m
+        description: Number of nearby parking locations.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: competing_cafe_count_500m
+        description: Number of nearby competing cafés.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: avg_competitor_rating_500m
+        description: Average rating of nearby competing cafés.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 5
+
+      - name: competitor_review_count_500m
+        description: Combined review count of nearby competing cafés.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: nearest_transit_distance_m
+        description: Distance in meters to the nearest transit station.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: nearest_parking_distance_m
+        description: Distance in meters to the nearest parking location.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: nearest_competitor_distance_m
+        description: Distance in meters to the nearest competing café.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: accessibility_score
+        description: >
+          Composite score based on nearby transit availability, transit
+          proximity, and nearby parking. Expected range is 0 through 8.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 8
+
+      - name: food_diversity_score
+        description: >
+          Count of selected food and beverage services offered by the café.
+          Expected range is 0 through 6.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 6
+
+      - name: competition_score
+        description: >
+          Score representing the concentration of nearby competing cafés.
+          Expected range is 0 through 3.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 3
+
+      - name: demand_score
+        description: >
+          Composite score based on the café's rating and review count.
+          Expected range is 0 through 6.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 6
+
+      - name: opportunity_score
+        description: >
+          Composite location score calculated as demand plus accessibility
+          plus food diversity minus competition. Expected range is -3 through 20.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -3
+                max_value: 20
+
+      - name: mart_created_at
+        description: Timestamp when the mart table was last created by dbt.
+        data_tests:
+          - not_null

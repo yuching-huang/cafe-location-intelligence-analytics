@@ -1,0 +1,92 @@
+version: 2
+
+models:
+  - name: int_cafe_nearby_features
+    description: >
+      Aggregates nearby amenities for each café, including transit,
+      parking, competing-café counts, and competitor review metrics.
+
+    columns:
+      - name: cafe_id
+        description: Unique identifier of the café.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_unique_cafes')
+                field: cafe_id
+
+      - name: transit_stop_count_500m
+        description: Number of transit stations found within the search radius.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: parking_count_300m
+        description: Number of parking locations found within the search radius.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: competing_cafe_count_500m
+        description: Number of competing cafés found within the search radius.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: avg_competitor_rating_500m
+        description: Average Google rating among nearby competing cafés.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 5
+
+      - name: competitor_review_count_500m
+        description: Total Google review count across nearby competing cafés.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+
+  - name: int_cafe_distance_features
+    description: >
+      Calculates the distance from each café to its nearest transit station,
+      parking location, and competing café using the Haversine function.
+
+    columns:
+      - name: cafe_id
+        description: Unique identifier of the café.
+        data_tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_unique_cafes')
+                field: cafe_id
+
+      - name: nearest_transit_distance_m
+        description: Distance in meters to the nearest transit station.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: nearest_parking_distance_m
+        description: Distance in meters to the nearest parking location.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: nearest_competitor_distance_m
+        description: Distance in meters to the nearest competing café.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0

@@ -1,0 +1,199 @@
+version: 2
+
+models:
+  - name: stg_google_places_cafes
+    description: >
+      Cleans and standardizes café records ingested from the Google Places API.
+      A café may appear more than once when it is returned by searches for
+      multiple neighborhoods.
+
+    columns:
+      - name: cafe_id
+        description: Unique Google Places identifier for the café.
+        data_tests:
+          - not_null
+
+      - name: cafe_name
+        description: Name of the café.
+        data_tests:
+          - not_null
+
+      - name: rating
+        description: Average Google rating for the café.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 5
+
+      - name: review_count
+        description: Number of Google reviews associated with the café.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: price_level
+        description: Google Places price-level classification.
+
+      - name: primary_type
+        description: Primary Google Places category assigned to the café.
+
+      - name: formatted_address
+        description: Full formatted street address returned by Google Places.
+
+      - name: latitude
+        description: Latitude coordinate of the café.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -90
+                max_value: 90
+
+      - name: longitude
+        description: Longitude coordinate of the café.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -180
+                max_value: 180
+
+      - name: search_neighborhood
+        description: Neighborhood search through which the café was discovered.
+
+      - name: ingested_at
+        description: Timestamp when the café record was ingested.
+
+
+  - name: stg_google_nearby_cafes
+    description: >
+      Cleans and standardizes nearby transit stations, parking locations,
+      and competing cafés returned for each café.
+
+    columns:
+      - name: cafe_place_id
+        description: Google Places identifier of the café associated with the nearby place.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_unique_cafes')
+                field: cafe_id
+
+      - name: nearby_place_id
+        description: Google Places identifier of the nearby location.
+        data_tests:
+          - not_null
+
+      - name: nearby_place_name
+        description: Name of the nearby location.
+
+      - name: amenity_type
+        description: Classification of the nearby location.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - transit_station
+                  - parking
+                  - competing_cafe
+
+      - name: nearby_rating
+        description: Google rating of the nearby place, when available.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 5
+
+      - name: nearby_review_count
+        description: Number of Google reviews for the nearby place.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: nearby_latitude
+        description: Latitude coordinate of the nearby location.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -90
+                max_value: 90
+
+      - name: nearby_longitude
+        description: Longitude coordinate of the nearby location.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -180
+                max_value: 180
+
+
+  - name: stg_unique_cafes
+    description: >
+      Produces one record per café by deduplicating café search results
+      and combining the neighborhoods in which each café was found.
+
+    columns:
+      - name: cafe_id
+        description: Unique Google Places identifier for the café.
+        data_tests:
+          - not_null
+          - unique
+
+      - name: cafe_name
+        description: Name of the café.
+        data_tests:
+          - not_null
+
+      - name: rating
+        description: Average Google rating for the café.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 5
+
+      - name: review_count
+        description: Number of Google reviews associated with the café.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+
+      - name: price_level
+        description: Google Places price-level classification.
+
+      - name: primary_type
+        description: Primary Google Places category assigned to the café.
+
+      - name: formatted_address
+        description: Full formatted address of the café.
+
+      - name: latitude
+        description: Latitude coordinate of the café.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -90
+                max_value: 90
+
+      - name: longitude
+        description: Longitude coordinate of the café.
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: -180
+                max_value: 180
+
+      - name: found_in_neighborhoods
+        description: Comma-separated list of neighborhood searches that returned the café.
+
+      - name: latest_ingested_at
+        description: Most recent ingestion timestamp among the café's source records.
