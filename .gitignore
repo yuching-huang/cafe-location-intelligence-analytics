@@ -227,3 +227,13 @@ profiles.yml
 *.pem
 *.p8
 *.key
+
+# Airflow local runtime files
+airflow/airflow.cfg
+airflow/airflow.db
+airflow/airflow.db-wal
+airflow/airflow.db-shm
+airflow/logs/
+airflow/simple_auth_manager_passwords.json.generated
+airflow/standalone_admin_password.txt
+airflow/*.pid

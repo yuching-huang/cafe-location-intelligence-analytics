@@ -5,6 +5,7 @@
 # 5. Insert raw JSON results into Snowflake
 
 import os
+from pathlib import Path
 import json
 import uuid
 import time
@@ -127,7 +128,8 @@ def main():
     batch_id = str(uuid.uuid4())
     print(f"Starting batch: {batch_id}")
 
-    neighborhoods = pd.read_csv("../data/neighborhoods.csv")
+    ROOT = Path(__file__).resolve().parents[1]
+    neighborhoods = pd.read_csv(ROOT / "data" / "neighborhoods.csv")
 
     conn = get_snowflake_connection()
 
