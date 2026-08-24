@@ -228,6 +228,11 @@ profiles.yml
 *.p8
 *.key
 
+# dbt generated files
+target/
+dbt/logs/
+dbt_packages/
+
 # Airflow local runtime files
 airflow/airflow.cfg
 airflow/airflow.db
