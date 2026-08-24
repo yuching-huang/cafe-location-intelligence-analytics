@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: raw   # alias for the source (typically the same as the source name, but it can be different if you want to use a different name in your dbt models)
+    database: cafe_location_intelligence
+    schema: raw
+    tables:
+      - name: raw_google_places_cafes
+      - name: raw_google_nearby_places
+      # - name: manual_cafe_enrichment
+        config:
+          loaded_at_field: ingested_at
+          freshness:
+            warn_after: {count: 60, period: day}
+            error_after: {count: 61, period: day}
+          
