@@ -230,6 +230,7 @@ profiles.yml
 
 # dbt generated files
 target/
+logs/
 dbt/logs/
 dbt_packages/
 
